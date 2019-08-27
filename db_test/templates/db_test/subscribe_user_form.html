@@ -1,0 +1,15 @@
+<div class="subscribe-blog-form">
+    <h4>Подписать пользователя</h4>
+<form method="post" action="{% url 'db_test:subscribe_user' %}">
+    {% csrf_token %}
+    <p>
+        <label>Id блога:</label><br>
+        <input type="number" name="id" autocomplete="off"/>
+    </p>
+    <p>
+        <label>Подписчики:</label><br>
+        <input type="text" name="subscribers"/>
+    </p>
+    <input type="submit" value="Сохранить">
+</form>
+</div>

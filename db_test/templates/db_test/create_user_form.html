@@ -1,0 +1,16 @@
+<div class="create-user-form">
+    <h4>Создать пользователя</h4>
+<form method="post" action="{% url 'db_test:create_user' %}">
+
+    {% csrf_token %}
+    <p>
+        <label>Имя:</label><br>
+        <input type="text" name="first_name"/>
+    </p>
+    <p>
+        <label>Фамилия:</label><br>
+        <input type="text" name="last_name"/>
+    </p>
+    <input type="submit" value="Сохранить">
+</form>
+</div>

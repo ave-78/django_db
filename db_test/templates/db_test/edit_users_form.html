@@ -1,0 +1,15 @@
+<div class="edit-users-form">
+    <h4>Редактирование пользователей</h4>
+<form method="post" action="{% url 'db_test:edit_users' %}">
+    {% csrf_token %}
+    <p>
+        <label>Имя:</label><br>
+        <input type="text" name="first_name" autocomplete="off" placeholder="имя|на что поменять"/>
+    </p>
+    <p>
+        <label>Фамилия:</label><br>
+        <input type="text" name="last_name"  placeholder="имя|на что поменять"/>
+    </p>
+    <input type="submit" value="Сохранить">
+</form>
+</div>

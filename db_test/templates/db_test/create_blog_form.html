@@ -1,0 +1,16 @@
+<div class="create-blog-form">
+    <h4>Создать блог</h4>
+<form method="post" action="{% url 'db_test:create_blog' %}">
+
+    {% csrf_token %}
+    <p>
+        <label>Название блога:</label><br>
+        <input type="text" name="title"/>
+    </p>
+    <p>
+        <label>Автор:</label><br>
+        <input type="text" name="author"/>
+    </p>
+    <input type="submit" value="Сохранить">
+</form>
+</div>

@@ -1,0 +1,15 @@
+<div class="unsubscribe-blog-form">
+    <h4>Отписать пользователя</h4>
+<form method="post" action="{% url 'db_test:unsubscribe_user' %}">
+    {% csrf_token %}
+    <p>
+        <label>Имя блога:</label><br>
+        <input type="text" name="title"/>
+    </p>
+    <p>
+        <label>Пользователь:</label><br>
+        <input type="text" name="first_name"/>
+    </p>
+    <input type="submit" value="Сохранить">
+</form>
+</div>

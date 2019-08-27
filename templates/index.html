@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock title %}
+{% block content %} Главная
+    <form method="POST">
+    {% csrf_token %}
+        <table>{{ form.as_table }}</table>
+    <input type="submit" value="send">
+    </form>
+    {% if name != 'Noname' and age != 'unknown'%}
+        <p>{{ fields }} you are {{ age }} years old!</p>
+    {% endif %}
+{% endblock content %}

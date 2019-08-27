@@ -1,0 +1,271 @@
+django-admin startproject django_work
+python manage.py runserver
+python manage.py startapp main
+settings.py -> INSTALLED_APPS -> 'main',
+
+main -> views.py ->
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.template.response import TemplateResponse
+
+def index(request):
+    return render(request, 'index.html')
+
+def main(request):
+#    data = {'header': 'Wellcome body', 'message': 'Glad to see you' }
+    header = "Personal Data"
+    langs = ["English", "German", "Spanish"]
+    user = {"name": "Tom", "age": 23}
+    addr = ("Абрикосовая", 23, 45)
+    data = {'header': header, 'langs': langs, 'addr': addr, 'user': user}
+    return render(request, 'main/home.html', context=data)
+
+def main1(request):
+    return TemplateResponse(request, 'main/home1.html')
+
+def about(request):
+    return HttpResponse("<h2>О сайте</h2>")
+
+def contact(request):
+    return HttpResponseRedirect("/about")
+
+def details(request):
+    return HttpResponsePermanentRedirect("/")
+# -----------------------------
+304 (Not Modified) HttpResponseNotModified
+400 (Bad Request) HttpResponseBadRequest
+403 (Forbidden) HttpResponseForbidden
+404 (Not Found) HttpResponseNotFound
+405 (Method Not Allowed) HttpResponseNotAllowed
+410 (Gone) HttpResponseGone
+500 (Internal Server Error) HttpResponseServerError
+# -------------------------------
+http://127.0.0.1:8000/products/1/?cat=phones
+def products(request, product_id = 1):
+    category = request.GET.get('cat', 'no such category')
+    result = f'<H2>Product № {product_id} Category: {category}</H2>'
+    return HttpResponse(result)
+
+def users(request, id, name):
+    result = f'<H2>User:</H2><H3> {id} name: {name}</H3>'
+    return HttpResponse(result)
+
+django_work -> urls.py ->
+from django.urls import re_path
+from django.views.generic import TemplateView
+from main import views
+urlpatterns = [
+    path('', views.index, name='home'),
+    path('main', views.main),
+    path('main1', views.main1),
+    re_path(r'^about/?$', views.about),
+    path('contact/', TemplateView.as_view(template_name="main/contact.html")), # Просто рендерит html без обращения к view
+    path('details/', views.details),
+    re_path(r'^products/?$', views.products),
+    re_path(r'^users/?$', views.users),
+    re_path('^products/(?P<product_id>\d+)/?', views.products),
+    path('^users/<int:id>/<str:name>/?', views.users),
+    path('admin/', admin.site.urls),
+]
+# ------------------------------
+str: соответствует любой строке за исключенем символа "/". Если спецификатор не указан, то используется по умолчанию
+int: соответствует любому положительному числу
+slug: соответствует последовательности буквенных символов ASCII, цифр, дефиса и символа подчеркивания, например, building-your-1st-django-site
+uuid: сооветствует идентификатору UUID, например, 075194d3-6885-417e-a8a8-6c931e272f00
+path: соответствует любой строке, которая также может включать символ "/" в отличие от спецификатора str
+# -------------------------------
+
+django_work(корень проекта) -> mkdir templates
+settings.py -> TEMPLATES -> 'DIRS': [os.path.join(BASE_DIR, 'templates')]
+
+django_works -> templates -> index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Django</title>
+</head>
+<body>
+    <h1>Welcome to Django!</h1>
+</body>
+</html>
+
+django_works -> main -> templates -> main -> home.html
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static "css/styles.css" %}" />
+    <title>Hello Django</title>
+</head>
+<body>
+    <h1>{{ header }}</h1>
+    <p>User: {{ user.name}} Age: {{ user.age }}</p>
+    <p>Address: st. {{ addr.0 }} b. {{ addr.1 }} ap. {{ addr.2 }}</p>
+    <p>Langs:
+    {% for i in langs %} {{ i }} {% endfor %}
+    </p>
+<img src="{% static "images/MSTA.jpg" %}" alt="Stones along the river" >
+</body>
+</html>
+
+django_work(корень проекта) -> mkdir static -> mkdir images, css
+django_work(корень проекта) -> main -> mkdir static -> mkdir images, css
+settings.py -> STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+forms.BooleanField: создает поле <input type="checkbox" >.
+Возвращает значение Boolean: True - если флажок отмечен и False - если флажок не отмечен.
+forms.CharField: предназначен для ввода текста
+forms.EmailField: предназначен для ввода адреса электронной почты
+forms.GenericIPAddressField: предназначен для ввода IP-адреса в формате IP4v или IP6v
+forms.RegexField (regex="регулярное_выражение"): предназначен для ввода текста,
+который должен соответствовать определенному регулярному выражению. Создает текстовое поле
+forms.SlugField(): предназначен для ввода текста, который условно называется "slug",
+то есть последовательность символов в нижнем регистре, чисел, дефисов и знаков подчеркивания.
+Создает текстовое поле
+forms.URLField(): предназначен для ввода ссылок.
+forms.UUIDField(): предназначен для ввода UUID (универсального уникального идентификатора).
+forms.ComboField(fields=[field1, field2,..]): аналогичен обычному текстовому полю за тем исключением, что требует,
+чтобы вводимый текст соответствовал требованиям тех полей, которые передаются через параметр fields.
+forms.MultiValueField(fields=[field1, field2,..]): предназначен для создания сложных компоновок, состоящих из нескольких полей.
+forms.FilePathField(path="каталог файлов"): создает список select, который содержит все папки и файлы в определенном каталоге
+forms.FileField(): предназначен для выбора файла.
+forms.ImageField(): предназначен также для выбора файла, но при этом добавляет ряд дополнительных возможностей.
+forms.DateField(): предназначен установки даты.
+forms.TimeField(): предназначен ввода времени, например, 14:30:59 или 14:30.
+forms.DateTimeField(): предназначен ввода даты и времени, например, 2017-12-25 14:30:59
+forms.DurationField(): предназначен временного промежутка. Вводимый текст должен соответствовать формату "DD HH:MM:SS",
+например, 2 1:10:20 (2 дня 1 час 10 минут 20 секунд).
+forms.SplitDateTimeField(): создает два текстовых поля для ввода соответственно даты и времени
+forms.IntegerField(): предназначен для ввода чисел.
+forms.DecimalField(): предназначен для ввода чисел.
+forms.FloatField(): предназначен для ввода чисел.
+forms.TypeChoiceField(choises=кортеж_кортежей, coerce=функция_преобразования, empty_value=None):
+также генерирует список select на основе кортежа. Однако дополнительно принимает функцию преобразования,
+ которая преобразует каждый элемент. И также принимает параметр empty_value,
+ который указывает на значение по умолчанию.
+forms.MultipleChoiceField(choises=кортеж_кортежей): также генерирует список select на основе кортежа,
+как и forms.ChoiceField, добавляя к создаваемому полю атрибут multiple="multiple".
+То есть список поддерживает множественный выбор.
+forms.TypedMultipleChoiceField(choises=кортеж_кортежей, coerce=функция_преобразования, empty_value=None):
+аналог forms.TypeChoiceField для списка с множественным выбором.
+
+Виджеты Django
+PasswordInput: генерирует поле для ввода пароля <input type="password" >
+HiddenInput: генерирует скрытое поле <input type="hidden" >
+MultipleHiddenInput: генерирует набор скрытых полей
+TextArea: генерирует многострочное текстовое поле <textarea></textarea>
+RadioSelect: генерирует список переключателей (радиокнопок) <input type="radio" >
+CheckboxSelectMultiple: генерирует список флажков <input type="checkbox" >
+TimeInput: генерирует поле для ввода времени (например, 12:41 или 12:41:32)
+SelectDateWidget: генерирует три поля select для выбора дня, месяца и года
+SplitHiddenDateTimeWidget: использует скрытое поле для хранения даты и времени
+FileInput: генерирует поле для выбора файла
+
+С помощью специальных методов можно настроить обзее отображение формы:
+as_table(): отображение в виде таблицы
+as_ul(): отображение в виде списка
+as_p(): каждое поле формы отобажается в отдельном параграфе
+{{ form.as_table }}
+
+Для тестирования формы можно установить у ней атрибут novalidate
+<form method="POST" novalidate>
+
+form.название_поля.name: возвращает название поля
+form.название_поля.value: возвращает значение поля, которое ему было передано по умолчанию
+form.название_поля.label: возвращает текст метки, которая генерируется рядом с полем
+form.название_поля.id_for_label: возвращает id для поля, которое по умолчанию создается по схеме id_имяполя.
+form.название_поля.auto_id: возвращает id для поля, которое по умолчанию создается по схеме id_имяполя.
+form.название_поля.label_tag: возвращает элемент label, который представляет метку рядом с полем
+form.название_поля.help_text: возвращает текст подказки, ассоциированный с полем
+form.название_поля.errors: возвращает ошибки валидации, связанные с полем
+form.название_поля.css_classes: возвращает css-классы поля
+form.название_поля.as_hidden: генерирует для поля разметку в виде скрытого поля <input type="hidden">
+form.название_поля.is_hidden: возвращает True или False в зависимости от того, является ли поле скрытым
+form.название_поля.as_text: генерирует для поля разметку в виде текстового поля <input type="text">
+form.название_поля.as_textarea: генерирует для поля разметку в виде <textarea></textarea>
+form.название_поля.as_widget: возвращает виджет Django, ассоциированны с полем
+
+
+class Person(models.Model):
+    name = models.CharField(max_length=20)
+    age = models.IntegerField()
+python manage.py makemigrations
+python manage.py migrate
+
+BinaryField(): хранит бинарные данные
+BooleanField(): хранит значение True или False (0 или 1)
+NullBooleanField(): хранит значение True или False или Null
+DateField(): хранит дату
+TimeField(): хранит время
+DateTimeField(): хранит дату и время
+DurationField(): хранит период времени
+AutoField(): хранит целочисленное значение, которое автоматически инкрементируется, обычно применяется для первичных ключей
+BigIntegerField(): представляет число - значение типа Number, которое укладывается в диапазон от -9223372036854775808 до 9223372036854775807. В зависимости от выбранной СУБД диапазон может немного отличаться
+DecimalField(decimal_places=X, max_digits=Y): представляет значение типа Number, которое имеет максимум X разрядов и Y знаков после запятой
+FloatField(): хранит, значение типа Number, которое представляет число с плавающей точкой
+IntegerField(): хранит значение типа Number, которое представляет целочисленное значение
+PositiveIntegerField(): хранит значение типа Number, которое представляет положительное целочисленное значение (от 0 до 2147483647)
+PositiveSmallIntegerField(): хранит значение типа Number, которое представляет небольшое положительное целочисленное значение (от 0 до 32767)
+SmallIntegerField(): хранит значение типа Number, которое представляет небольшое целочисленное значение (от -32768 до 32767)
+CharField(max_length=N): хранит строку длиной не более N символов
+TextField(): хранит строку неопределенной длины
+EmailField(): хранит строку, которая представляет email-адрес. Значение автоматически валидируется встроенным валидатором EmailValidator
+FileField(): хранит строку, которая представляет имя файла
+FilePathField(): хранит строку, которая представляет путь к файлу длиной в 100 символов
+ImageField(): хранит строку, которая представляет данные об изображении
+GenericIPAddressField(): хранит строку, которая представляет IP-адрес в формате IP4v или IP6v
+SlugField(): хранит строку, которая может содержать только буквы в нижнем регитре, цифры, дефис и знак подчеркивания
+URLField(): хранит строку, которая представляет валидный URL-адрес
+UUIDField(): хранит строку, которая представляет UUID-идетификатор
+
+tom = Person(name="Tom", age=23)
+tom.save()
+bob = Person.objects.get(age=23)
+bob, created = Person.objects.get_or_create(name="Bob", age=24)
+people = Person.objects.all()
+people = Person.objects.filter(age=23)
+people = Person.objects.exclude(age=23)
+people = Person.objects.filter(name="Tom").exclude(age=23)
+people = Person.objects.in_bulk() #возвращает словать
+for id in people:
+    print(people[id].name)
+    print(people[id].age)
+
+# получаем объекты с id=1 и id=3
+people2 = Person.objects.in_bulk([1,3])
+for id in people2:
+    print(people2[id].name)
+    print(people2[id].age)
+
+bob = Person.objects.get(id=2)
+bob.name = "Bobic"
+bob.save(update_fields=["name"]) # Обновляет не весь объект, а только одно поле
+Person.objects.filter(id=2).update(name="Mike") #в сочетании с методом filter, которые вместе выполняют один запрос к базе данных
+
+from django.db.models import F
+# Иногда бывает необходимо изменить значение столбца в бд на основании уже имеющегося значения.
+В этом случае мы можем использовать функцию F()
+Person.objects.all(id=2).update(age = F("age") + 1) # В данном случае полю age присваивается уже имеющееся значение, увеличенное на единицу
+При этом важно учитывать, что метод update обновляет все записи в таблице, которые соответствуют условию.
+
+Если надо обновить вообще все записи, вне зависимости от условия, то необходимо комбинировать метод update с методом all():
+Person.objects.all().update(name="Mike")
+
+Метод update_or_create обновляет запись, а если ее нет, то добавляет ее в таблицу:
+values_for_update={"name":"Bob", "age": 31}
+bob, created = Person.objects.update_or_create(id=2, defaults = values_for_update)
+
+Для удаления мы можем вызвать метод delete() у удаляемого объекта:
+person = Person.objects.get(id=2)
+person.delete()
+или
+Person.objects.filter(id=4).delete()
+
+свойства query у результата запроса мы можем получить SQL-запрос, который выполнялся.
+people = Person.objects.filter(name="Tom").exclude(age=34)
+print(people.query)

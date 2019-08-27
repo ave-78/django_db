@@ -1,0 +1,15 @@
+<div class="like-topic-form">
+    <h4>Лайкнуть топик</h4>
+<form method="post" action="{% url 'db_test:like_topic' %}">
+    {% csrf_token %}
+    <p>
+        <label>Id топика:</label><br>
+        <input type="number" name="id" autocomplete="off"/>
+    </p>
+    <p>
+        <label>Пользователи:</label><br>
+        <input type="text" name="likes"/>
+    </p>
+    <input type="submit" value="Сохранить">
+</form>
+</div>
